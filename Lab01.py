@@ -5,9 +5,10 @@
 # 3. Assignment Description:
 #      Play the game of Tic-Tac-Toe
 # 4. What was the hardest part? Be as specific as possible.
-#      -a paragraph or two about how the assignment went for you-
+#      The hardest part of this assignment was adding checks for improper input. It took me a bit to figure
+#       out how to do it, and there were several errors along the way that I had to resolve.
 # 5. How long did it take for you to complete the assignment?
-#      -total time in hours including reading the assignment and submitting the program-
+#      This took about three and a half hours
 
 import json
 
@@ -20,26 +21,33 @@ BLANK = ' '
 # A blank Tic-Tac-Toe board. We should not need to change this board;
 # it is only used to reset the board to blank. This should be the format
 # of the code in the JSON file.
-blank_board = {  
-            "board": [
+blank_board = [
                 BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK ]
-        }
-test_board = {  
-            "board": [
-                X, O, BLANK,
-                X, O, X,
+
+test_board = [
+                X, O, O,
+                X, BLANK, X,
                 O, X, BLANK ]
-        }
+        
 def read_board(filename):
     '''Read the previously existing board from the file if it exists.'''
     # Put file reading code here.
-    return blank_board['board']
+    with open(filename, 'r') as filehandle:
+        file = json.load(filehandle)
+        data = file["board"]
+        for i in data:
+            if i == " ":
+                i = BLANK
+        return data
+   
 
 def save_board(filename, board):
     '''Save the current game to a file.'''
-    # Put file writing code here.
+    board_dict = {"board": board}
+    with open(filename, "w") as f:
+        json.dump(board_dict, f)
 
 def display_board(board):
     print(f" {board[0]} | {board[1]} | {board[2]} ")
@@ -47,20 +55,51 @@ def display_board(board):
     print(f" {board[3]} | {board[4]} | {board[5]} ")
     print(f"---+---+---")
     print(f" {board[6]} | {board[7]} | {board[8]} \n")
-    # Put display code here.
 
 def is_x_turn(board):
     '''Determine whose turn it is.'''
-    # Put code here determining if it is X's turn.
-    return True
+    x_count = 0
+    o_count = 0
+    for i in board:
+        if i == "X":
+            x_count += 1
+        if i == "O":
+            o_count += 1
+    if x_count <= o_count:
+        return True
+    else:
+        return False
 
 def play_game(board):
     '''Play the game of Tic-Tac-Toe.'''
-    if is_x_turn(board):
-        turn_indicator = X
-    else:
-        turn_indicator = O
-    return False
+    print("Enter 'q' to suspend your game. Otherwise, enter a number from 1 to 9")
+    print("where the following numbers correspond to the locations on the grid:")
+    print(" 1 | 2 | 3 ")
+    print("---+---+---")
+    print(" 4 | 5 | 6 ")
+    print("---+---+---")
+    print(" 7 | 8 | 9 \n")
+    print("The current board is:")
+    game_input = ""
+    while game_done(board, True) == False and game_input != "q":
+        if is_x_turn(board):
+            turn = X
+        else:
+            turn = O
+        display_board(board)
+        game_input = input(f"{turn}> ")
+        while game_input != "q" and game_input.isdigit() == False:
+            display_board(board)
+            print("Please give a proper input.")
+            game_input = input(f"{turn}> ")
+        if game_input == "q":
+            return board
+        if 1 <= int(game_input) <= 9 and board[int(game_input) - 1] == " ":
+            board[int(game_input) - 1] = turn
+        else:
+            print("Please give a proper input.")
+    return board
+        
 
 def game_done(board, message=False):
     '''Determine if the game is finished.
@@ -103,34 +142,43 @@ def game_done(board, message=False):
 
     return False
 
-# These user-instructions are provided and do not need to be changed.
-print("Enter 'q' to suspend your game. Otherwise, enter a number from 1 to 9")
-print("where the following numbers correspond to the locations on the grid:")
-print(" 1 | 2 | 3 ")
-print("---+---+---")
-print(" 4 | 5 | 6 ")
-print("---+---+---")
-print(" 7 | 8 | 9 \n")
-print("The current board is:")
 
-# The file read code, game loop code, and file close code goes here.
 def display_menu():
     print("Select what you would like to do:")
     print("1. Start a new game")
+    print("2. Resume game")
     print("2. Load a saved game")
     print("3. Save current game")
-    print("")
-    print("")
-    print("")
-# user_input = input()
-# match user_input:
-#     case "1":
-#         print("Starting new game")
-#     case "2":
-#         filename = input("Input file name to load from: ")
-#         board = read_board(filename)
-#     case "3":
-#         filename = input("Input file name to save to: ")
-#         save_board(filename, board)
+    print("4. Quit")
 
-display_board(test_board["board"])
+def main():
+    done = False
+    board = []
+    while done == False:
+        display_menu()
+        menu_input = input("> ")
+        match menu_input:
+            case "1":
+                print("Starting new game")
+                board = play_game(blank_board.copy())
+                print(board)
+            case "2":
+                print("Resuming game")
+                if board == []:
+                    print("Blank resume")
+                    board = play_game(blank_board.copy())
+                else:
+                    print("play resume")
+                    board = play_game(board)
+            case "3":
+                filename = input("Input file name to load from: ")
+                board = read_board(filename)
+                board = play_game(board)
+            case "4":
+                filename = input("Input file name to save to: ")
+                save_board(filename, board)
+            case "5":
+                done = True
+    print("Thank you for playing!")
+
+main()
