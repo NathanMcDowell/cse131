@@ -26,17 +26,85 @@ def convert_integer(int):
 def convert_to_binary(int):
     '''Convert an integer into a binary string.
     Return a binary string'''
-    return '0b001101101'
+    binary_digits = []
+    if int == 0:
+        return '0'
+    while int > 0:
+        binary_digits.append(int % 2)
+        int = int // 2
+    binary_string = ''
+    for i in range(len(binary_digits)-1, -1, -1):
+        binary_string = binary_string + str(binary_digits[i])
+    return binary_string
+
+def test_convert_to_binary():
+    assert convert_to_binary(0) == '0'
+    assert convert_to_binary(1) == '1'
+    assert convert_to_binary(5) == '101'
+    assert convert_to_binary(10) == '1010'
+    assert convert_to_binary(13) == '1101'
+    assert convert_to_binary(14) == '1110'
+    assert convert_to_binary(15) == '1111'
+    assert convert_to_binary(255) == '11111111'
+    assert convert_to_binary(256) == '100000000'
+    print('Binary conversion successfully tested.')
 
 def convert_to_octal(int):
     '''Convert an integer into an octal string.
     Return a octal string'''
-    return '0o12353'
+    octal_digits = []
+    if int == 0:
+        return '0'
+    while int > 0:
+        octal_digits.append(int % 8)
+        int = int // 8
+    octal_string = ''
+    for i in range(len(octal_digits)-1, -1, -1):
+        octal_string = octal_string + str(octal_digits[i])
+    return octal_string
+
+def test_convert_to_octal():
+    assert convert_to_octal(0) == '0'
+    assert convert_to_octal(1) == '1'
+    assert convert_to_octal(5) == '5'
+    assert convert_to_octal(10) == '12'
+    assert convert_to_octal(13) == '15'
+    assert convert_to_octal(14) == '16'
+    assert convert_to_octal(15) == '17'
+    assert convert_to_octal(255) == '377'
+    assert convert_to_octal(256) == '400'
+    print('Octal conversion successfully tested.')
 
 def convert_to_hex(int):
     '''Convert an integer into a hex string.
     Return a hex string'''
-    return '0xB3'
+    hex_digits = []
+    if int == 0:
+        return '0'
+    while int > 0:
+        hex_digits.append(int % 16)
+        int = int // 16
+    hex_lookup = '0123456789ABCDEF'
+    
+    hex_string = ''
+    for i in range(len(hex_digits)-1, -1, -1):
+        hex_string += hex_lookup[hex_digits[i]]
+    return hex_string
+
+def test_convert_to_hex():
+    assert convert_to_hex(0) == '0'
+    assert convert_to_hex(1) == '1'
+    assert convert_to_hex(5) == '5'
+    assert convert_to_hex(10) == 'A'
+    assert convert_to_hex(11) == 'B'
+    assert convert_to_hex(12) == 'C'
+    assert convert_to_hex(13) == 'D'
+    assert convert_to_hex(14) == 'E'
+    assert convert_to_hex(15) == 'F'
+    assert convert_to_hex(16) == '10'
+    assert convert_to_hex(255) == 'FF'
+    assert convert_to_hex(256) == '100'
+    print('Hex conversion successfully tested.')
 
 def display(int, binary, octal, hex):
     '''Display number and it's conversions.'''
@@ -51,7 +119,12 @@ def main():
     # int = get_integer()
     # binary, octal, hex = convert_integer(int)
     # display(int, binary, octal, hex)
-    get_integer()
+    int = get_integer()
+    binary, octal, hex = convert_to_binary(int), convert_to_octal(int), convert_to_hex(int)
+    display(int, binary, octal, hex)
+    test_convert_to_binary()
+    test_convert_to_octal()
+    test_convert_to_hex()
 
 main()
 
